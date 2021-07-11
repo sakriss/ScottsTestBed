@@ -16,8 +16,12 @@ class NetworkManager: Codable {
     var breeds: Breeds?
     
     func fetchData() {
-
-        let session = URLSession.shared
+        
+        let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = TimeInterval(5)
+        configuration.timeoutIntervalForResource = TimeInterval(5)
+        
+        let session = URLSession(configuration: configuration)
         let url = URL(string: "https://catfact.ninja/breeds")!
 
         let task = session.dataTask(with: url) { data, response, error in

@@ -16,31 +16,14 @@ class ViewController: UIViewController, WKUIDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        NetworkManager.shared.fetchData()
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        loadingDataAnimation()
+//        loadingDataAnimation()
         NetworkManager.shared.fetchData()
         NotificationCenter.default.addObserver(self, selector: #selector(dataFetched) , name: NetworkManager.dataParseComplete, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(dataFailed) , name: NetworkManager.dataParseFailed, object: nil)
-        
-        func loadingDataAnimation() {
-            
-            //*** small alert on load with blur background ***/
-            let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
-            let blurEffectView = UIVisualEffectView(effect: blurEffect)
-            blurEffectView.frame = view.bounds
-            let alert = UIAlertController(title: nil, message: "Gathering data...", preferredStyle: .alert)
-            let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
-            loadingIndicator.hidesWhenStopped = true
-            loadingIndicator.style = UIActivityIndicatorView.Style.medium
-            loadingIndicator.startAnimating()
-            view.addSubview(blurEffectView)
-            alert.view.addSubview(loadingIndicator)
-            present(alert, animated: true, completion: nil)
-            
-        }
         
         let attributes = [NSAttributedString.Key.foregroundColor: UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)]
         refreshControl.tintColor = UIColor(red: 213/255, green: 220/255, blue: 232/255, alpha: 1)
@@ -89,7 +72,7 @@ class ViewController: UIViewController, WKUIDelegate {
                                                 
                                                 //initiate the refreshdata call and start the animation
                                                 self.refreshData(sender: AnyObject.self as AnyObject)
-                                                //                                                self.loadingDataAnimation()
+                                                self.loadingDataAnimation()
                                                 
                                                 print("default")
                                                 
@@ -101,10 +84,26 @@ class ViewController: UIViewController, WKUIDelegate {
                                                 
                                             }}))
             self.present(alert, animated: true, completion: nil)
+            self.mainTableView.reloadData()
+            self.refreshControl.endRefreshing()
         }
+    }
+    
+    func loadingDataAnimation() {
         
-        self.mainTableView.reloadData()
-        self.refreshControl.endRefreshing()
+        //*** small alert on load with blur background ***/
+        let blurEffect = UIBlurEffect(style: UIBlurEffect.Style.light)
+        let blurEffectView = UIVisualEffectView(effect: blurEffect)
+        blurEffectView.frame = view.bounds
+        let alert = UIAlertController(title: nil, message: "Gathering data...", preferredStyle: .alert)
+        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 10, y: 5, width: 50, height: 50))
+        loadingIndicator.hidesWhenStopped = true
+        loadingIndicator.style = UIActivityIndicatorView.Style.medium
+        loadingIndicator.startAnimating()
+        view.addSubview(blurEffectView)
+        alert.view.addSubview(loadingIndicator)
+        present(alert, animated: true, completion: nil)
+        
     }
 }
 
@@ -132,7 +131,7 @@ extension ViewController: UITableViewDataSource {
         if let breedName = dataPoint?[indexPath.row].breed {
             cell.breedNameLbl.text = breedName
         }
-        
+        cell.selectionStyle = .none
         return cell
     }
 }
